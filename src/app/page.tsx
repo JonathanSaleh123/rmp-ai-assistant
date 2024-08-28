@@ -29,12 +29,15 @@ export default function Home() {
       body: JSON.stringify([...messages, {role: 'user', content: message}]),
     }).then(async (res) => {
       // Add the response to the chat
+      if (!res.body) {
+        throw new Error('Response body is null')
+      }
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
       let result = ''
   
       // Read the response as a stream
-      return reader.read().then(function processText({done, value}) {
+      return reader.read().then(function processText({done, value}: ReadableStreamReadResult<Uint8Array>): string | Promise<string> {
         if (done) {
           return result
         }
