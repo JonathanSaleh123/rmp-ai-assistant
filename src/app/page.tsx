@@ -10,6 +10,49 @@ export default function Home() {
     },
   ])
   const [message, setMessage] = useState('')
+  const [url, setUrl] = useState('')
+  const [response, setResponse] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    setResponse(null);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to scrape and upload data');
+      }
+
+      const data = await res.json();
+      setResponse(data.message);
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendToPinecone = async (reviews: any) => {
+    const res = await fetch('/api/upload/route', {  // Assuming your route.js is handling the Pinecone logic
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reviews),
+    });
+
+    const result = await res.json();
+    console.log(result);
+  };
 
   const sendMessage = async () => {
     // Add the user message to the chat
@@ -102,7 +145,28 @@ export default function Home() {
             </Box>
           ))}
         </Stack>
-        <Stack direction={'row'} spacing={2}>
+        
+        {/* RMP Link Input */}
+        <Stack direction={'column'} spacing={2} marginTop={2}>
+          <TextField
+            label="Rate My Professor Link"
+            fullWidth
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Paste the link here"
+            required
+          />
+          <Button 
+            variant="contained" 
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? 'Processing...' : 'Submit'}
+          </Button>
+          {response && <p style={{ color: 'green' }}>{response}</p>}
+        </Stack>
+
+        <Stack direction={'row'} spacing={2} marginTop={2}>
           <TextField
             label="Message"
             fullWidth
@@ -116,5 +180,4 @@ export default function Home() {
       </Stack>
     </Box>
   )
-
 }

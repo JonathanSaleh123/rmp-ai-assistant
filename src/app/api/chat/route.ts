@@ -9,7 +9,7 @@ For every user question, the top 3 professors that match the user question are r
 Use them to answer the question if needed.
 `
 const pc = new Pinecone({
-    apiKey: process.env.PINECONE_API_KEY,
+    apiKey: process.env.PINECONE_API_KEY || '',
   })
 
 const index = pc.index('rag').namespace('ns1')
@@ -18,7 +18,7 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 })
 
-export async function POST(req) {
+export async function POST(req: any) {
     const data = await req.json()
     const text = data[data.length - 1].content
     // Get the text embedding from OpenAI
@@ -40,9 +40,9 @@ export async function POST(req) {
     resultString += `
     Returned Results:
     Professor: ${match.id}
-    Review: ${match.metadata.stars}
-    Subject: ${match.metadata.subject}
-    Stars: ${match.metadata.stars}
+    Review: ${match.metadata?.stars ?? 'N/A'}
+    Subject: ${match.metadata?.subject ?? 'N/A'}
+    Stars: ${match.metadata?.stars ?? 'N/A'}
     \n\n`
     })
 
