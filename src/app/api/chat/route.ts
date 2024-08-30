@@ -6,10 +6,13 @@ import OpenAI from 'openai'
 const systemPrompt = `
 You are a rate my professor agent to help students find classes, that takes in user questions and answers them.
 For every user question, the top 3 professors that match the user question are returned.
-Use them to answer the question if needed.
+Use them to answer the question if needed. Please format the response with clear structure:
+Use numbered lists for main points (e.g., 1., 2., 3.).
+For details or sub-points, use bullet points (e.g., - or •).
+Separate each section with a new line.
 `
 const pc = new Pinecone({
-    apiKey: process.env.PINECONE_API_KEY,
+    apiKey: process.env.PINECONE_API_KEY || '',
   })
 
 const index = pc.index('rag').namespace('ns1')
@@ -18,7 +21,7 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 })
 
-export async function POST(req) {
+export async function POST(req: any) {
     const data = await req.json()
     const text = data[data.length - 1].content
     // Get the text embedding from OpenAI
@@ -40,9 +43,9 @@ export async function POST(req) {
     resultString += `
     Returned Results:
     Professor: ${match.id}
-    Review: ${match.metadata.stars}
-    Subject: ${match.metadata.subject}
-    Stars: ${match.metadata.stars}
+    Review: ${match.metadata?.review ?? 'N/A'}
+    Subject: ${match.metadata?.subject ?? 'N/A'}
+    Rating: ${match.metadata?.rating ?? 'N/A'}
     \n\n`
     })
 
