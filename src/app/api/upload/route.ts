@@ -32,9 +32,16 @@ export async function POST(req: any) {
           console.error(`Execution error: ${error}`);
           return resolve(NextResponse.json({ error: 'Failed to execute script' }, { status: 500 }));
         }
+        else {
+          console.log(`Execution completed.`)
+          console.log(JSON.stringify(JSON.parse(stdout), null, 2))
+          console.log('end')
+        }
 
         try {
           const reviews = JSON.parse(stdout);
+
+          const processedData: any[] = []
 
           // Process reviews and upload to Pinecone
           for (const review of reviews) {
@@ -47,17 +54,28 @@ export async function POST(req: any) {
             });
 
             // Insert into Pinecone
-            await index.upsert([
-              {
-                id: review.professor,  // or some unique identifier
-                values: embedding.data[0].embedding,
-                metadata: {
-                  subject: review.subject,
-                  rating: review.rating,
-                  date: review.date,
-                }
+            const dataTemp = {
+              id: review.professor,  // or some unique identifier
+              values: embedding.data[0].embedding,
+              metadata: {
+                review: review.review,
+                subject: review.subject,
+                rating: review.rating,
               }
-            ]);
+            };
+            
+            // Print the data to the console
+            console.log("Metadata before Pinecone storage:", {
+              professor: review.professor,
+              subject: review.subject,
+              review: review.review,
+              rating: review.rating,
+            });
+            
+            processedData.push(dataTemp)
+
+            // Upsert the data
+            await index.upsert(processedData);
           }
 
           resolve(NextResponse.json({ message: 'Data uploaded successfully to Pinecone' }));

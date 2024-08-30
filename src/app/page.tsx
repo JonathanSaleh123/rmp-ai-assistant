@@ -41,18 +41,18 @@ export default function Home() {
     }
   };
 
-  const sendToPinecone = async (reviews: any) => {
-    const res = await fetch('/api/upload/route', {  // Assuming your route.js is handling the Pinecone logic
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reviews),
-    });
+  // const sendToPinecone = async (reviews: any) => {
+  //   const res = await fetch('/api/upload/route', {  // Assuming your route.js is handling the Pinecone logic
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(reviews),
+  //   });
 
-    const result = await res.json();
-    console.log(result);
-  };
+  //   const result = await res.json();
+  //   console.log(result);
+  // };
 
   const sendMessage = async () => {
     // Add the user message to the chat

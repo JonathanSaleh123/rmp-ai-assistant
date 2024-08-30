@@ -40,9 +40,9 @@ export async function POST(req: any) {
     resultString += `
     Returned Results:
     Professor: ${match.id}
-    Review: ${match.metadata?.stars ?? 'N/A'}
+    Review: ${match.metadata?.review ?? 'N/A'}
     Subject: ${match.metadata?.subject ?? 'N/A'}
-    Stars: ${match.metadata?.stars ?? 'N/A'}
+    Rating: ${match.metadata?.rating ?? 'N/A'}
     \n\n`
     })
 
